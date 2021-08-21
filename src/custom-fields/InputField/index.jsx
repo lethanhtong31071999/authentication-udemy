@@ -23,7 +23,8 @@ function InputField(props) {
       control={form.control}
       render={(field) => {
         const { onChange, onBlur, value, name } = field;
-        const { invalid, error } = field["fieldState"];
+        const { invalid, error } = field.fieldState;
+
         return (
           <TextField
             name={name}
