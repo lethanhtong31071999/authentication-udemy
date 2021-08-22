@@ -64,7 +64,7 @@ export default function Header() {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
         disableEscapeKeyDown
-        // disableBackdropClick
+        disableBackdropClick
       >
         <DialogContent>
           <Register />

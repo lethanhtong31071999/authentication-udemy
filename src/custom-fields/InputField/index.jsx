@@ -21,16 +21,11 @@ function InputField(props) {
     <Controller
       name={name}
       control={form.control}
-      render={(field) => {
-        const { onChange, onBlur, value, name } = field;
-        const { invalid, error } = field.fieldState;
-
+      render={(props) => {
+        const { invalid, error } = props.fieldState;
         return (
           <TextField
-            name={name}
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value}
+            {...props.field}
             error={invalid}
             helperText={error?.message}
             margin="normal"
