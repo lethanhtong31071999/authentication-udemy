@@ -1,3 +1,4 @@
+import ProductFeature from "features/Product";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -10,8 +11,10 @@ function App() {
         <Header />
 
         <Switch>
-          <Redirect exact from="/" to="/photos" />
+          <Redirect exact from="/" to="/products" />
+
           <Route path="/photos" component={Photo} />
+          <Route path="/products" component={ProductFeature} />
         </Switch>
       </BrowserRouter>
     </div>

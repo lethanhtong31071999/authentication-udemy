@@ -75,7 +75,6 @@ const userSlice = createSlice({
 });
 
 const { reducer, actions } = userSlice;
-console.log("action: ", userSlice);
 export const { logoutAction } = actions;
 export { registerAction, loginAction };
 export default reducer;

@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     paddingTop: theme.spacing(4),
     position: "relative",
+    transition: "all 0.3s linear",
   },
   avatar: {
     margin: "0 auto",
