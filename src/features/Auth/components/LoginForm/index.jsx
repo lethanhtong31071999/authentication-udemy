@@ -1,7 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { useForm } from "react-hook-form";
-import InputField from "../../../../custom-fields/InputField";
 import {
   Avatar,
   Button,
@@ -10,19 +8,21 @@ import {
   Typography,
 } from "@material-ui/core";
 import { LockOutlined } from "@material-ui/icons";
-import PasswordField from "../../../../custom-fields/PasswordField";
+import InputField from "custom-fields/InputField";
+import PasswordField from "custom-fields/PasswordField";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-RegisterForm.propTypes = {
+LoginForm.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-RegisterForm.defaultProps = {
+LoginForm.defaultProps = {
   onSubmit: null,
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyle = makeStyles((theme) => ({
   root: {
     paddingTop: theme.spacing(4),
     position: "relative",
@@ -45,49 +45,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function RegisterForm(props) {
-  const classes = useStyles();
+function LoginForm({ onSubmit }) {
+  const classes = useStyle();
+
   const schema = Yup.object().shape({
-    fullName: Yup.string()
-      .trim()
-      .required("Pls enter your full name")
-      .test("nameRule-TwoWord", "Pls enter at least 2 words!", (value) => {
-        return value.split(" ").length > 1;
-      }),
-
-    email: Yup.string()
-      .trim()
-      .required("Pls enter your email")
+    identifier: Yup.string()
+      .required("Enter your email!")
       .email("Invalid email!"),
-
-    password: Yup.string()
-      .trim()
-      .required("Pls enter this field")
-      .min(6, "at least 6 letters"),
-    confirmPassword: Yup.string()
-      .trim()
-      .required("Pls enter this field")
-      .oneOf([Yup.ref("password")], "Password does not match"),
+    password: Yup.string().required("Enter your password"),
   });
 
   const form = useForm({
     defaultValues: {
-      fullName: "",
-      email: "",
+      identifier: "",
       password: "",
-      confirmPassword: "",
     },
     resolver: yupResolver(schema),
   });
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const onHandleSubmit = async (values) => {
-    const { onSubmit } = props;
-    console.log("Submit: ", typeof onSubmit);
-    if (onSubmit) {
-      await onSubmit(values);
-    }
+  const handleFormSubmit = async (values) => {
+    if (!onSubmit) return;
+    await onSubmit(values);
   };
 
   return (
@@ -98,18 +78,12 @@ function RegisterForm(props) {
       </Avatar>
 
       <Typography className={classes.title} component="h3" variant="h5">
-        Create an Account
+        Login
       </Typography>
 
-      <form onSubmit={form.handleSubmit(onHandleSubmit)}>
-        <InputField form={form} label="Full Name" name="fullName" />
-        <InputField form={form} label="Email" name="email" />
+      <form onSubmit={form.handleSubmit(handleFormSubmit)}>
+        <InputField form={form} label="Email" name="identifier" />
         <PasswordField form={form} label="Password" name="password" />
-        <PasswordField
-          form={form}
-          label="Confirm Password"
-          name="confirmPassword"
-        />
         <Button
           className={classes.submit}
           fullWidth
@@ -120,11 +94,11 @@ function RegisterForm(props) {
           disabled={isSubmitting}
           margin="normal"
         >
-          Create an Account
+          Sign In
         </Button>
       </form>
     </div>
   );
 }
 
-export default RegisterForm;
+export default LoginForm;

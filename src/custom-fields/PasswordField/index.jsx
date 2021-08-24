@@ -52,7 +52,6 @@ function PasswordField(props) {
 
             if (error) setErrorMess(error.message);
             else setErrorMess("");
-            console.log(props);
             return (
               <OutlinedInput
                 {...props.field}
