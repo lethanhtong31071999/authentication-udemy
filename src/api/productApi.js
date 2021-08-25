@@ -12,7 +12,6 @@ const productApi = {
     // create a newParams
     const newParams = { ...params };
 
-    console.log(params._page, params._limit);
     if (params._page && Number.isInteger(params._page) && params._page > 1) {
       newParams._start = (newParams._page - 1) * (params._limit || 20);
     } else newParams._start = 0;

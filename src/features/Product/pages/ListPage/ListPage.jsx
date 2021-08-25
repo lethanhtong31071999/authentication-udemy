@@ -7,6 +7,9 @@ import { useState } from "react";
 import ProductSkeleton from "features/Product/components/ProductSkeleton";
 import ProductList from "features/Product/components/ProductList";
 import { Pagination } from "@material-ui/lab";
+import ProductSort from "features/Product/components/ProductSort";
+import Filter from "features/Product/components/Filter";
+import FillterSkeleton from "features/Product/components/FillterSkeleton";
 
 ListPage.propTypes = {};
 
@@ -40,9 +43,12 @@ function ListPage(props) {
     limit: 10,
     total: 10,
   });
+
+  // Filter phai giong param tren url de gui Request
   const [filters, setFilters] = useState({
     _page: 1,
     _limit: 10,
+    _sort: "salePrice:ASC",
   });
 
   useEffect(() => {
@@ -51,7 +57,6 @@ function ListPage(props) {
       const getProduct = async () => {
         const response = await productApi.getAll(filters);
         const { data, pagination } = response;
-        console.log(pagination);
         setProductList(data);
         setPagination(pagination);
         setLoading(false);
@@ -73,15 +78,48 @@ function ListPage(props) {
     }));
   };
 
+  const handleSortChange = (value) => {
+    setFilters((state) => ({
+      ...state,
+      _sort: value,
+    }));
+  };
+
+  const handleChangeFilter = (valuesFilters) => {
+    const cloneFilters = {
+      ...filters,
+      ...valuesFilters,
+    };
+
+    // Truong hop gia start end = 0 sau khi submit
+    if (Object.entries(valuesFilters).length < 1) {
+      console.log("checked");
+      delete cloneFilters.salePrice_gte;
+      delete cloneFilters.salePrice_lte;
+    }
+
+    setFilters(cloneFilters);
+  };
+
   return (
     <Box>
       <Container>
         <Grid container spacing={2}>
           <Grid item className={classes.left}>
-            <Paper elevation={0}>left column</Paper>
+            <Paper elevation={0}>
+              {loading ? (
+                <FillterSkeleton />
+              ) : (
+                <Filter onChange={handleChangeFilter} />
+              )}
+            </Paper>
           </Grid>
           <Grid item className={classes.right}>
             <Paper elevation={0} className={classes.wrapper}>
+              <ProductSort
+                valueSort={filters._sort}
+                onSortChange={(value) => handleSortChange(value)}
+              />
               {loading ? (
                 <ProductSkeleton />
               ) : (
