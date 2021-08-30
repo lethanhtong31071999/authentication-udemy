@@ -1,11 +1,13 @@
-import { Box } from "@material-ui/core";
+import { Box, Typography } from "@material-ui/core";
 import PropTypes from "prop-types";
 import React from "react";
 import FilterByCategory from "./components/FilterByCategory";
 import FilterByPrice from "./components/FilterByPrice";
+import FilterByService from "./components/FilterByService";
 
 Filter.propTypes = {
   onChange: PropTypes.func,
+  filters: PropTypes.object.isRequired,
 };
 
 Filter.defaultProps = {
@@ -13,28 +15,17 @@ Filter.defaultProps = {
 };
 
 function Filter(props) {
-  const { onChange } = props;
+  const { onChange, filters } = props;
 
-  const handleCategoryChange = (categoryId) => {
-    if (!onChange) return;
-    onChange({ "category.id": categoryId });
-  };
-
-  const handlePriceChange = (objectPrice) => {
-    console.log("delte: ", objectPrice);
-    if (!onChange) return;
-    let count = 0;
-    for (const key in objectPrice) {
-      if (objectPrice[key] === 0) count++;
-    }
-
-    count === 2 ? onChange({}) : onChange(objectPrice);
+  const handleChange = (values) => {
+    onChange(values);
   };
 
   return (
     <Box>
-      <FilterByCategory onChange={handleCategoryChange} />
-      <FilterByPrice onChange={handlePriceChange} />
+      <FilterByCategory filters={filters} onChange={handleChange} />
+      <FilterByPrice filters={filters} onChange={handleChange} />
+      <FilterByService filters={filters} onChange={handleChange} />
     </Box>
   );
 }

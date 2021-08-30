@@ -1,15 +1,15 @@
-import React from "react";
-import PropTypes from "prop-types";
 import { Box, Container, Grid, makeStyles, Paper } from "@material-ui/core";
-import { useEffect } from "react";
-import productApi from "api/productApi";
-import { useState } from "react";
-import ProductSkeleton from "features/Product/components/ProductSkeleton";
-import ProductList from "features/Product/components/ProductList";
 import { Pagination } from "@material-ui/lab";
-import ProductSort from "features/Product/components/ProductSort";
-import Filter from "features/Product/components/Filter";
+import productApi from "api/productApi";
 import FillterSkeleton from "features/Product/components/FillterSkeleton";
+import Filter from "features/Product/components/Filter";
+import FilterViewer from "features/Product/components/FilterViewer";
+import ProductList from "features/Product/components/ProductList";
+import ProductSkeleton from "features/Product/components/ProductSkeleton";
+import ProductSort from "features/Product/components/ProductSort";
+import React, { useEffect, useState } from "react";
+import queryString from "query-string";
+import { useHistory, useLocation } from "react-router-dom";
 
 ListPage.propTypes = {};
 
@@ -36,20 +36,34 @@ const useStyle = makeStyles((theme) => ({
 
 function ListPage(props) {
   const classes = useStyle();
+
+  const history = useHistory();
+  const location = useLocation();
+  // Convert params url to object
+  const queryParams = queryString.parse(history.location.search);
+  // Filter phai giong param tren url de gui Request
+  const [filters, setFilters] = useState({
+    ...queryParams,
+    _page: Number.parseInt(queryParams._page) || 1,
+    _limit: Number.parseInt(queryParams._limit) || 12,
+    _sort: queryParams._sort || "salePrice:ASC",
+  });
+
   const [loading, setLoading] = useState(true);
   const [productList, setProductList] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 1,
     total: 10,
   });
 
-  // Filter phai giong param tren url de gui Request
-  const [filters, setFilters] = useState({
-    _page: 1,
-    _limit: 10,
-    _sort: "salePrice:ASC",
-  });
+  // when url was set then filters state sync with url (set default url)
+  useEffect(() => {
+    history.push({
+      pathname: history.location.pathname,
+      search: queryString.stringify(filters),
+    });
+  }, [filters]);
 
   useEffect(() => {
     // Did mount
@@ -86,19 +100,8 @@ function ListPage(props) {
   };
 
   const handleChangeFilter = (valuesFilters) => {
-    const cloneFilters = {
-      ...filters,
-      ...valuesFilters,
-    };
-
-    // Truong hop gia start end = 0 sau khi submit
-    if (Object.entries(valuesFilters).length < 1) {
-      console.log("checked");
-      delete cloneFilters.salePrice_gte;
-      delete cloneFilters.salePrice_lte;
-    }
-
-    setFilters(cloneFilters);
+    // Da xu ly valuesFilters la object moi o component con
+    setFilters(valuesFilters);
   };
 
   return (
@@ -110,7 +113,7 @@ function ListPage(props) {
               {loading ? (
                 <FillterSkeleton />
               ) : (
-                <Filter onChange={handleChangeFilter} />
+                <Filter filters={filters} onChange={handleChangeFilter} />
               )}
             </Paper>
           </Grid>
@@ -120,6 +123,7 @@ function ListPage(props) {
                 valueSort={filters._sort}
                 onSortChange={(value) => handleSortChange(value)}
               />
+              <FilterViewer filters={filters} onChange={handleChangeFilter} />
               {loading ? (
                 <ProductSkeleton />
               ) : (

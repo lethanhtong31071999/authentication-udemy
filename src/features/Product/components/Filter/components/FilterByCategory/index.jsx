@@ -4,9 +4,13 @@ import { Box, makeStyles, Typography } from "@material-ui/core";
 import { useEffect } from "react";
 import categoryApi from "api/categoryApi";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addCategory } from "features/Product/categorySlice";
+import { useRef } from "react";
 
 FilterByCategory.propTypes = {
   onChange: PropTypes.func,
+  filters: PropTypes.object.isRequired,
 };
 
 FilterByCategory.defaultProps = {
@@ -34,14 +38,21 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 function FilterByCategory(props) {
-  const { onChange } = props;
+  const { onChange, filters } = props;
   const [categoryList, setCategoryList] = useState([]);
+  const categoryRef = useRef([]);
   const classes = useStyle();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     try {
       const getCategories = async () => {
         const data = await categoryApi.getAll();
         const mapCategoryList = data.map((x) => ({ id: x.id, name: x.name }));
+        // Set redux
+        dispatch(addCategory(mapCategoryList));
+
+        mapCategoryList.unshift({ id: "all", name: "All" });
         setCategoryList(mapCategoryList);
       };
       getCategories();
@@ -54,7 +65,22 @@ function FilterByCategory(props) {
 
   const handleOnChange = (categoryId) => {
     if (!onChange) return;
-    onChange(categoryId);
+
+    // Set multiple selected categories
+    let selectedId = categoryRef.current;
+    selectedId.push(categoryId);
+    // filters duplicate values
+    selectedId = selectedId.filter(
+      (item, index, originArr) => originArr.indexOf(item) === index
+    );
+
+    // Callback function in parent component.
+    const cloneFilters = { ...filters, "category.id_in": selectedId };
+    if (categoryId === "all") {
+      categoryRef.current = [];
+      delete cloneFilters["category.id_in"];
+    }
+    onChange(cloneFilters);
   };
 
   return (

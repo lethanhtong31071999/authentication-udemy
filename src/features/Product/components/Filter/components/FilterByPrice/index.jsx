@@ -8,9 +8,11 @@ import {
   Typography,
 } from "@material-ui/core";
 import { useState } from "react";
+import { useEffect } from "react";
 
 FilterByPrice.propTypes = {
   onChange: PropTypes.func,
+  filters: PropTypes.object.isRequired,
 };
 
 FilterByPrice.defaultProps = {
@@ -41,7 +43,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 function FilterByPrice(props) {
-  const { onChange } = props;
+  const { onChange, filters } = props;
 
   const initialState = {
     salePrice_gte: 0,
@@ -59,14 +61,27 @@ function FilterByPrice(props) {
     }));
   };
 
-  const handleOnSubmit = () => {
-    if (!onChange) return;
-    onChange(rangePrice);
+  const isInValidRange = () => {
+    let count = 0;
+    for (const key in rangePrice) {
+      if (rangePrice[key] === 0) count++;
+    }
+    return count === 2 ? true : false;
   };
 
+  const handleOnSubmit = () => {
+    if (!onChange) return;
+    const cloneFilters = { ...filters, ...rangePrice };
+
+    if (isInValidRange()) {
+      delete cloneFilters["salePrice_gte"];
+      delete cloneFilters["salePrice_lte"];
+    }
+
+    onChange(cloneFilters);
+  };
   const handleResetField = () => {
     setRangePrice(initialState);
-    onChange(initialState);
   };
 
   return (

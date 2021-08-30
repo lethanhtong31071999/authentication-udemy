@@ -3,10 +3,22 @@ import axiosClient from "./axiosClient";
 const productApi = {
   async getAll(params) {
     // params: {_page, _limit} so page muon hien thi
+    // Xu ly truong hop get Product with mutiple category
+    // Case with 2 gategory
+    const isMutipleCategory =
+      Boolean(params["category.id_in"]) &&
+      Array.isArray(params["category.id_in"]);
+    const categoryParams = isMutipleCategory
+      ? params["category.id_in"].map((x) => `category.id_in=${x}`).join("&")
+      : null;
 
     // Url
-    const productUrl = "/products";
-    const countProductUrl = "/products/count";
+    const productUrl = isMutipleCategory
+      ? `/products?${categoryParams}`
+      : "/products";
+    const countProductUrl = isMutipleCategory
+      ? `/products/count?${categoryParams}`
+      : "/products/count";
 
     // convert _page to _start
     // create a newParams
@@ -18,6 +30,7 @@ const productApi = {
 
     // Delete unneeds
     delete newParams._page;
+
     // Call API
     // Response da dc xu ly o file axiosClient
     const dataProducts = await axiosClient.get(productUrl, {
@@ -26,8 +39,8 @@ const productApi = {
     const dataCount = await axiosClient.get(countProductUrl, {
       params: newParams,
     });
-    // console.log("products: ", productList);
-    // console.log("count: ", productCount);
+    // console.log("products: ", dataProducts);
+    // console.log("count: ", dataCount);
 
     // Create response
     const response = {
