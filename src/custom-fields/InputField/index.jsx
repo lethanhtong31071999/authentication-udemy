@@ -22,6 +22,7 @@ function InputField(props) {
       name={name}
       control={form.control}
       render={(props) => {
+        // console.log("props input field: ", props);
         const { invalid, error } = props.fieldState;
         return (
           <TextField

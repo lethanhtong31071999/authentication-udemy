@@ -54,7 +54,7 @@ const productApi = {
     return response;
   },
 
-  get: async (id) => {
+  get(id) {
     const url = `products/${id}`;
     return axiosClient.get(url);
   },

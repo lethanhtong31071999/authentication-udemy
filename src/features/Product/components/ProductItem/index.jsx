@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
 import { Box, makeStyles, Typography } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
 import { PLACEHOLDER_IMG, STATIC_HOST } from "constanst/common";
+import PropTypes from "prop-types";
+import React from "react";
+import { useHistory } from "react-router-dom";
 
 ProductItem.propTypes = {
   product: PropTypes.object,
@@ -22,14 +22,24 @@ const useStyle = makeStyles({
 
 function ProductItem(props) {
   const classes = useStyle();
+  const history = useHistory();
   const { product } = props;
   const productImgUrl = product.thumbnail?.url;
   const imgUrl = productImgUrl
     ? `${STATIC_HOST}${productImgUrl}`
     : PLACEHOLDER_IMG;
+
+  const handleOnClick = (e) => {
+    history.push(`/products/${product?.id}`);
+  };
+
   return (
     <Box padding={1} className={classes.root}>
-      <Box padding={1}>
+      <Box
+        padding={1}
+        style={{ cursor: "pointer" }}
+        onClick={(e) => handleOnClick(e)}
+      >
         <img src={imgUrl} alt={product.name} width="100%" />
       </Box>
       <Box marginTop="auto">
