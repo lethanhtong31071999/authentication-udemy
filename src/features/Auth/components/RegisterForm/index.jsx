@@ -48,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
 
 function RegisterForm(props) {
   const classes = useStyles();
+
   const schema = Yup.object().shape({
     fullName: Yup.string()
       .trim()
